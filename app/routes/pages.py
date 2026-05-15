@@ -17,8 +17,7 @@ def home(request: Request, search: Optional[str] = None, message: Optional[str] 
     else:
         recipes = recipe_storage.get_all_recipes()
     
-    return templates.TemplateResponse("index.html", {
-        "request": request,
+    return templates.TemplateResponse(request, "index.html", {
         "recipes": recipes,
         "search_query": search or "",
         "message": message
@@ -28,8 +27,7 @@ def home(request: Request, search: Optional[str] = None, message: Optional[str] 
 @router.get("/recipes/new", response_class=HTMLResponse)
 def new_recipe_form(request: Request):
     """New recipe form"""
-    return templates.TemplateResponse("recipe_form.html", {
-        "request": request,
+    return templates.TemplateResponse(request, "recipe_form.html", {
         "recipe": None,
         "is_edit": False
     })
@@ -42,8 +40,7 @@ def recipe_detail(request: Request, recipe_id: str, message: Optional[str] = Non
     if not recipe:
         raise HTTPException(status_code=404, detail="Recipe not found")
     
-    return templates.TemplateResponse("recipe_detail.html", {
-        "request": request,
+    return templates.TemplateResponse(request, "recipe_detail.html", {
         "recipe": recipe,
         "message": message
     })
@@ -56,8 +53,7 @@ def edit_recipe_form(request: Request, recipe_id: str):
     if not recipe:
         raise HTTPException(status_code=404, detail="Recipe not found")
     
-    return templates.TemplateResponse("recipe_form.html", {
-        "request": request,
+    return templates.TemplateResponse(request, "recipe_form.html", {
         "recipe": recipe,
         "is_edit": True
     })
@@ -75,15 +71,12 @@ def create_recipe_form(
 ):
     """Handle new recipe form submission"""
     try:
-        # Check title length
         if len(title) > 200:
             raise ValueError("Title too long")
         
-        # Parse ingredients (one per line) and tags (comma-separated)
         ingredient_list = [ing.strip() for ing in ingredients.split('\n') if ing.strip()]
         tag_list = [tag.strip() for tag in tags.split(',') if tag.strip()]
         
-        # Validation
         if len(ingredient_list) == 0:
             raise ValueError("At least one ingredient required")
         
@@ -124,11 +117,9 @@ def update_recipe_form(
 ):
     """Handle edit recipe form submission"""
     try:
-        # Check title length
         if len(title) > 200:
             raise ValueError("Title is too long!")
         
-        # Parse ingredients (one per line) and tags (comma-separated)
         ingredient_list = [ing.strip() for ing in ingredients.split('\n') if ing.strip()]
         tag_list = [tag.strip() for tag in tags.split(',') if tag.strip()]
         
@@ -184,7 +175,6 @@ def delete_recipe_form(recipe_id: str):
 @router.get("/import", response_class=HTMLResponse)
 def import_page(request: Request, message: Optional[str] = None):
     """Import recipes page"""
-    return templates.TemplateResponse("import.html", {
-        "request": request,
+    return templates.TemplateResponse(request, "import.html", {
         "message": message
     })
