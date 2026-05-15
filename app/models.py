@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, field_serializer
+from pydantic import BaseModel, Field, ConfigDict
 from datetime import datetime
 from typing import List, Optional
 from enum import Enum
@@ -14,6 +14,8 @@ class DifficultyLevel(str, Enum):
     HARD = "Hard"
 
 class Recipe(BaseModel):
+    model_config = ConfigDict()
+
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     title: str 
     description: str
@@ -24,11 +26,6 @@ class Recipe(BaseModel):
     created_at: datetime = Field(default_factory=datetime.now)
     updated_at: datetime = Field(default_factory=datetime.now)
 
-    @field_serializer('created_at', 'updated_at')
-    def serialize_datetime(self, value: datetime) -> str:
-        return value.isoformat()
-
-
 class RecipeCreate(BaseModel):
     title: str
     description: str
@@ -36,7 +33,6 @@ class RecipeCreate(BaseModel):
     instructions: str
     tags: List[str] = Field(default_factory=list)
     difficulty: DifficultyLevel
-
 
 class RecipeUpdate(BaseModel):
     title: str
