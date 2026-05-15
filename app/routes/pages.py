@@ -17,28 +17,20 @@ def home(request: Request, search: Optional[str] = None, message: Optional[str] 
     else:
         recipes = recipe_storage.get_all_recipes()
     
-    return templates.TemplateResponse(
-        name="index.html",
-        context={
-            "request": request,
-            "recipes": recipes,
-            "search_query": search or "",
-            "message": message
-        }
-    )
+    return templates.TemplateResponse(request, "index.html", {
+        "recipes": recipes,
+        "search_query": search or "",
+        "message": message
+    })
 
 
 @router.get("/recipes/new", response_class=HTMLResponse)
 def new_recipe_form(request: Request):
     """New recipe form"""
-    return templates.TemplateResponse(
-        name="recipe_form.html",
-        context={
-            "request": request,
-            "recipe": None,
-            "is_edit": False
-        }
-    )
+    return templates.TemplateResponse(request, "recipe_form.html", {
+        "recipe": None,
+        "is_edit": False
+    })
 
 
 @router.get("/recipes/{recipe_id}", response_class=HTMLResponse)
@@ -48,14 +40,10 @@ def recipe_detail(request: Request, recipe_id: str, message: Optional[str] = Non
     if not recipe:
         raise HTTPException(status_code=404, detail="Recipe not found")
     
-    return templates.TemplateResponse(
-        name="recipe_detail.html",
-        context={
-            "request": request,
-            "recipe": recipe,
-            "message": message
-        }
-    )
+    return templates.TemplateResponse(request, "recipe_detail.html", {
+        "recipe": recipe,
+        "message": message
+    })
 
 
 @router.get("/recipes/{recipe_id}/edit", response_class=HTMLResponse)
@@ -65,14 +53,10 @@ def edit_recipe_form(request: Request, recipe_id: str):
     if not recipe:
         raise HTTPException(status_code=404, detail="Recipe not found")
     
-    return templates.TemplateResponse(
-        name="recipe_form.html",
-        context={
-            "request": request,
-            "recipe": recipe,
-            "is_edit": True
-        }
-    )
+    return templates.TemplateResponse(request, "recipe_form.html", {
+        "recipe": recipe,
+        "is_edit": True
+    })
 
 
 @router.post("/recipes/new")
@@ -87,15 +71,12 @@ def create_recipe_form(
 ):
     """Handle new recipe form submission"""
     try:
-        # Check title length
         if len(title) > 200:
             raise ValueError("Title too long")
         
-        # Parse ingredients (one per line) and tags (comma-separated)
         ingredient_list = [ing.strip() for ing in ingredients.split('\n') if ing.strip()]
         tag_list = [tag.strip() for tag in tags.split(',') if tag.strip()]
         
-        # Validation
         if len(ingredient_list) == 0:
             raise ValueError("At least one ingredient required")
         
@@ -136,11 +117,9 @@ def update_recipe_form(
 ):
     """Handle edit recipe form submission"""
     try:
-        # Check title length
         if len(title) > 200:
             raise ValueError("Title is too long!")
         
-        # Parse ingredients (one per line) and tags (comma-separated)
         ingredient_list = [ing.strip() for ing in ingredients.split('\n') if ing.strip()]
         tag_list = [tag.strip() for tag in tags.split(',') if tag.strip()]
         
@@ -196,10 +175,6 @@ def delete_recipe_form(recipe_id: str):
 @router.get("/import", response_class=HTMLResponse)
 def import_page(request: Request, message: Optional[str] = None):
     """Import recipes page"""
-    return templates.TemplateResponse(
-        name="import.html",
-        context={
-            "request": request,
-            "message": message
-        }
-    )
+    return templates.TemplateResponse(request, "import.html", {
+        "message": message
+    })
